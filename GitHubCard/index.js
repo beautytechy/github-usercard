@@ -23,7 +23,6 @@
           Using that array, iterate over it, requesting data for each user, creating a new card for each
           user, and adding that card to the DOM.
 */
-
 const followersArray = [];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
@@ -53,3 +52,95 @@ const followersArray = [];
   luishrd
   bigknell
 */
+
+
+axios.get('https://api.github.com/users/beautytechy')
+  .then(response => {
+    console.log(response);
+    const newCard = CreateCard(response.data);
+
+    const entryPoint = document.querySelector('.cards')
+    entryPoint.appendChild(newCard);
+  })
+  .catch(error => {
+    console.log("The data was not returned", error);
+  });
+
+axios.get('https://api.github.com/users/beautytechy/followers').then(response => {
+    response.data.forEach(user => {
+      followersArray.push(user.login);
+    })
+
+    console.log(followersArray)
+    followersArray.forEach(user => {
+      axios.get(`https://api.github.com/users/${user}`)
+        .then(response => {
+          const newCard = CreateCard(response.data);
+          const entryPoint = document.querySelector('.cards')
+          entryPoint.appendChild(newCard);
+        }).catch(error => {
+          console.log("The data was not returned", error);
+        });
+    })
+  }).catch(error => {
+    console.log("The data was not returned", error);
+  });
+
+function callNow() {
+  
+}
+console.log(followersArray)
+
+
+
+
+function CreateCard(data) {
+
+  //Elements
+  const mainCard = document.createElement('div');
+  const profileImage = document.createElement('img');
+  const info = document.createElement('div');
+  const personName = document.createElement('h3');
+  const userName = document.createElement('p');
+  const userLoc = document.createElement('p');
+  const profilePage = document.createElement('p');
+  const githubLink = document.createElement('a');
+  const userFollowers = document.createElement('p');
+  const userFollowing = document.createElement('p');
+  const userBio = document.createElement('p');
+
+  //Structure
+  mainCard.appendChild(profileImage)
+  mainCard.appendChild(info)
+  info.appendChild(personName)
+  info.appendChild(userName)
+  info.appendChild(userLoc)
+  info.appendChild(profilePage)
+  profilePage.appendChild(githubLink)
+  info.appendChild(userFollowers)
+  info.appendChild(userFollowing)
+  info.appendChild(userBio)
+
+  //Styling
+  mainCard.classList.add('card')
+  info.classList.add('card-info')
+  personName.classList.add('name')
+  userName.classList.add('username')
+
+  profileImage.src = data.avatar_url
+  personName.textContent = data.name
+  userName.textContent = data.login
+  userLoc.textContent = data.location
+  userFollowers.textContent = data.followersArray
+  userFollowing.textContent = data.following
+  userBio.textContent = data.bio
+
+  return mainCard
+
+}
+
+
+
+
+
+
