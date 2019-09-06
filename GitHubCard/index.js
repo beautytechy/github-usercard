@@ -23,7 +23,6 @@
           Using that array, iterate over it, requesting data for each user, creating a new card for each
           user, and adding that card to the DOM.
 */
-
 const followersArray = [];
 
 /* Step 3: Create a function that accepts a single object as its only argument,
@@ -57,17 +56,45 @@ const followersArray = [];
 
 axios.get('https://api.github.com/users/beautytechy')
   .then(response => {
-    console.log(response.data);
+    console.log(response);
     const newCard = CreateCard(response.data);
 
-    const entryPoint = document.querySelector(".cards")
+    const entryPoint = document.querySelector('.cards')
     entryPoint.appendChild(newCard);
-    })
+  })
   .catch(error => {
     console.log("The data was not returned", error);
   });
 
-function CreateCard(param) {
+axios.get('https://api.github.com/users/beautytechy/followers').then(response => {
+    response.data.forEach(user => {
+      followersArray.push(user.login);
+    })
+
+    console.log(followersArray)
+    followersArray.forEach(user => {
+      axios.get(`https://api.github.com/users/${user}`)
+        .then(response => {
+          const newCard = CreateCard(response.data);
+          const entryPoint = document.querySelector('.cards')
+          entryPoint.appendChild(newCard);
+        }).catch(error => {
+          console.log("The data was not returned", error);
+        });
+    })
+  }).catch(error => {
+    console.log("The data was not returned", error);
+  });
+
+function callNow() {
+  
+}
+console.log(followersArray)
+
+
+
+
+function CreateCard(data) {
 
   //Elements
   const mainCard = document.createElement('div');
@@ -100,26 +127,18 @@ function CreateCard(param) {
   personName.classList.add('name')
   userName.classList.add('username')
 
-  profileImage.src = '${data.avatar_url}'
-  personName.textContent = '{data.name}'
-  userName.textContent = '${login}'
-  userLoc.textContent = '${location}'
-  userFollowers.textContent = '${followersArray}'
-  userFollowing.textContent = '${following}'
-  userBio.textContent = '${bio}'
+  profileImage.src = data.avatar_url
+  personName.textContent = data.name
+  userName.textContent = data.login
+  userLoc.textContent = data.location
+  userFollowers.textContent = data.followersArray
+  userFollowing.textContent = data.following
+  userBio.textContent = data.bio
 
-
-  return CreateCard
+  return mainCard
 
 }
 
-
-
-
-// console.log(CreateCard())
-
-
-// CreateCard(response.data);
 
 
 
